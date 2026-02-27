@@ -3,6 +3,8 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { client } from "./data";
+import { UpgradeProvider } from "./upgrade-context";
+import UpgradeModal from "./upgrade-modal";
 
 function IconGrid() {
   return (
@@ -54,69 +56,87 @@ function IconCpu() {
   );
 }
 
-const navItems = [
-  { label: "My Feed",    href: "/dashboard",          icon: <IconGrid />,   badge: undefined },
-  { label: "AI Systems", href: "/dashboard/systems",  icon: <IconCpu />,    badge: undefined },
-  { label: "Experts",    href: "/dashboard/experts",  icon: <IconUsers />,  badge: undefined },
-  { label: "My Company", href: "/dashboard/profile",  icon: <IconPerson />, badge: undefined },
+const navItemsFree = [
+  { label: "My Feed", href: "/dashboard", icon: <IconGrid />, badge: undefined },
+  { label: "AI Systems", href: "/dashboard/systems", icon: <IconCpu />, badge: undefined },
+  { label: "Experts", href: "/dashboard/experts", icon: <IconUsers />, badge: undefined },
+  { label: "My Company", href: "/dashboard/profile", icon: <IconPerson />, badge: undefined },
+];
+
+const navItemsUnlimited = [
+  { label: "My Feed", href: "/dashboard/unlimited", icon: <IconGrid />, badge: undefined },
+  { label: "AI Systems", href: "/dashboard/unlimited/systems", icon: <IconCpu />, badge: undefined },
+  { label: "Experts", href: "/dashboard/unlimited/experts", icon: <IconUsers />, badge: undefined },
+  { label: "My Company", href: "/dashboard/unlimited/profile", icon: <IconPerson />, badge: undefined },
 ];
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const isUnlimited = pathname.startsWith("/dashboard/unlimited");
+  const navItems = isUnlimited ? navItemsUnlimited : navItemsFree;
 
   return (
-    <div className="flex h-screen bg-slate-50 overflow-hidden" style={{ fontFamily: "var(--font-inter), system-ui, sans-serif" }}>
+    <UpgradeProvider>
+      <UpgradeModal />
+      <div className="flex h-screen bg-slate-50 overflow-hidden" style={{ fontFamily: "var(--font-inter), system-ui, sans-serif" }}>
 
-      {/* ── Sidebar ──────────────────────────────────────── */}
-      <aside className="w-56 shrink-0 bg-white border-r border-slate-200 flex flex-col">
+        {/* ── Sidebar ──────────────────────────────────────── */}
+        <aside className="w-56 shrink-0 bg-white border-r border-slate-200 flex flex-col">
 
-        {/* Logo */}
-        <div className="px-5 py-5 border-b border-slate-100">
-          <span className="text-2xl font-bold text-slate-900 tracking-tight">Complai</span>
-        </div>
+          {/* Logo */}
+          <div className="px-5 py-5 border-b border-slate-100">
+            <span className="text-2xl font-bold text-slate-900 tracking-tight">Complai</span>
+          </div>
 
-        {/* Nav */}
-        <nav className="flex-1 px-3 py-3 flex flex-col gap-0.5">
-          {navItems.map((item) => {
-            const active = pathname === item.href;
-            return (
-              <Link
-                key={item.label}
-                href={item.href}
-                className={`flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition-colors ${
-                  active
+          {/* Nav */}
+          <nav className="flex-1 px-3 py-3 flex flex-col gap-0.5">
+            {/* Unlimited / Free toggle */}
+            <div className="mb-2 flex rounded-lg border border-slate-200 overflow-hidden text-xs font-medium">
+              <Link href="/dashboard" className={`flex-1 text-center py-1.5 transition-colors ${!isUnlimited ? "bg-slate-900 text-white" : "text-slate-500 hover:bg-slate-50"
+                }`}>Free</Link>
+              <Link href="/dashboard/unlimited" className={`flex-1 text-center py-1.5 transition-colors ${isUnlimited ? "bg-slate-900 text-white" : "text-slate-500 hover:bg-slate-50"
+                }`}>Unlimited</Link>
+            </div>
+            {navItems.map((item) => {
+              const active = pathname === item.href;
+              return (
+                <Link
+                  key={item.label}
+                  href={item.href}
+                  className={`flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition-colors ${active
                     ? "bg-slate-900 text-white font-medium"
                     : "text-slate-500 hover:bg-slate-50 hover:text-slate-800"
-                }`}
-              >
-                <span className={active ? "text-white" : "text-slate-400"}>{item.icon}</span>
-                <span className="flex-1">{item.label}</span>
-                {item.badge && (
-                  <span className="text-xs font-bold bg-red-500 text-white rounded-full w-4 h-4 flex items-center justify-center">
-                    {item.badge}
-                  </span>
-                )}
-              </Link>
-            );
-          })}
-        </nav>
+                    }`}
+                >
+                  <span className={active ? "text-white" : "text-slate-400"}>{item.icon}</span>
+                  <span className="flex-1">{item.label}</span>
+                  {item.badge && (
+                    <span className="text-xs font-bold bg-red-500 text-white rounded-full w-4 h-4 flex items-center justify-center">
+                      {item.badge}
+                    </span>
+                  )}
+                </Link>
+              );
+            })}
+          </nav>
 
-        {/* Company identity — bottom */}
-        <div className="px-4 py-3.5 border-t border-slate-100 flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bg-slate-900 flex items-center justify-center text-sm font-bold text-white shrink-0">
-            {client.name[0]}
+          {/* Company identity — bottom */}
+          <div className="px-4 py-3.5 border-t border-slate-100 flex items-center gap-3">
+            <div className="w-8 h-8 rounded-lg bg-slate-900 flex items-center justify-center text-sm font-bold text-white shrink-0">
+              {client.name[0]}
+            </div>
+            <div className="min-w-0">
+              <p className="text-sm font-semibold text-slate-900 truncate leading-tight">{client.name}</p>
+              <p className="text-xs text-slate-400 truncate">{client.hq}</p>
+            </div>
           </div>
-          <div className="min-w-0">
-            <p className="text-sm font-semibold text-slate-900 truncate leading-tight">{client.name}</p>
-            <p className="text-xs text-slate-400 truncate">{client.hq}</p>
-          </div>
+        </aside>
+
+        {/* ── Page content ────────────────────────────────── */}
+        <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
+          {children}
         </div>
-      </aside>
-
-      {/* ── Page content ────────────────────────────────── */}
-      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
-        {children}
       </div>
-    </div>
+    </UpgradeProvider>
   );
 }

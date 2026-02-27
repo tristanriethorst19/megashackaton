@@ -3,13 +3,6 @@
 import { useState } from "react";
 import { LinkButton } from "@/components/ui/Button";
 
-const links = [
-  { label: "How It Works", href: "#features" },
-  { label: "Partners",     href: "#partners" },
-  { label: "Regulations",  href: "#regulations" },
-  { label: "Pricing",      href: "#pricing" },
-];
-
 export function Navbar() {
   const [open, setOpen] = useState(false);
 
@@ -23,27 +16,13 @@ export function Navbar() {
             <img src="/Vector.svg" alt="Complai" className="h-5 w-auto" />
           </a>
 
-          {/* Desktop links */}
-          <ul className="hidden md:flex items-center gap-6">
-            {links.map((l) => (
-              <li key={l.label}>
-                <a
-                  href={l.href}
-                  className="text-sm text-slate-500 hover:text-slate-900 transition-colors"
-                >
-                  {l.label}
-                </a>
-              </li>
-            ))}
-          </ul>
-
           {/* Desktop actions */}
           <div className="hidden md:flex items-center gap-2 bg-slate-100 rounded-xl p-1">
-            <LinkButton href="/login" variant="ghost" size="sm" className="rounded-lg text-slate-600 hover:bg-white hover:text-slate-900 hover:shadow-sm">
-              Log in
+            <LinkButton href="/onboarding" variant="ghost" size="sm" className="rounded-lg text-slate-600 hover:bg-white hover:text-slate-900 hover:shadow-sm">
+              Onboarding
             </LinkButton>
-            <LinkButton href="/onboarding" variant="primary" size="sm" className="rounded-lg shadow-sm">
-              Get started
+            <LinkButton href="/dashboard" variant="primary" size="sm" className="rounded-lg shadow-sm">
+              Dashboard
             </LinkButton>
           </div>
 
@@ -63,20 +42,10 @@ export function Navbar() {
 
         {/* Mobile menu */}
         {open && (
-          <div className="md:hidden border-t border-slate-100 px-5 py-4 flex flex-col gap-3">
-            {links.map((l) => (
-              <a
-                key={l.label}
-                href={l.href}
-                className="text-sm text-slate-500 hover:text-slate-900 py-1"
-                onClick={() => setOpen(false)}
-              >
-                {l.label}
-              </a>
-            ))}
-            <div className="flex gap-2 mt-1 bg-slate-100 rounded-xl p-1">
-              <LinkButton href="/login"      variant="ghost"   size="sm" className="flex-1 justify-center rounded-lg text-slate-600 hover:bg-white hover:shadow-sm">Log in</LinkButton>
-              <LinkButton href="/onboarding" variant="primary" size="sm" className="flex-1 rounded-lg shadow-sm">Get started</LinkButton>
+          <div className="md:hidden border-t border-slate-100 px-5 py-4 flex flex-col gap-2">
+            <div className="flex flex-col gap-2 bg-slate-100 rounded-xl p-1">
+              <LinkButton href="/onboarding" variant="ghost" size="sm" className="justify-center rounded-lg text-slate-600 hover:bg-white hover:shadow-sm" onClick={() => setOpen(false)}>Onboarding</LinkButton>
+              <LinkButton href="/dashboard" variant="primary" size="sm" className="justify-center rounded-lg shadow-sm" onClick={() => setOpen(false)}>Dashboard</LinkButton>
             </div>
           </div>
         )}

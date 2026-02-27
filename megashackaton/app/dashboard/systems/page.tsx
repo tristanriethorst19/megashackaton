@@ -2,8 +2,7 @@
 
 import { useState } from "react";
 import { client } from "../data";
-
-// ── Workflow catalogue ────────────────────────────────────────────────────────
+import { useUpgrade } from "../upgrade-context";
 
 const WORKFLOWS = [
   { id: "support-chatbot", label: "Customer support chatbot", desc: "AI handling inbound customer queries" },
@@ -18,18 +17,7 @@ const WORKFLOWS = [
   { id: "data-analytics", label: "Automated analytics", desc: "BI pipelines & dashboards" },
 ];
 
-// Map the client's existing aiSystems strings to workflow IDs
-const INITIAL_ACTIVE: string[] = (() => {
-  const mapping: Record<string, string> = {
-    "Automated CV screening (Workday AI)": "cv-screening",
-    "AI performance monitoring": "performance-monitoring",
-    "Payroll automation": "payroll-automation",
-    "HR chatbot (internal)": "support-chatbot",
-  };
-  return client.aiSystems.map((s) => mapping[s]).filter(Boolean) as string[];
-})();
-
-// ── Icon helpers ──────────────────────────────────────────────────────────────
+const INITIAL_ACTIVE = ["cv-screening"];
 
 function IconCheck({ className = "w-3 h-3" }: { className?: string }) {
   return (
@@ -39,71 +27,45 @@ function IconCheck({ className = "w-3 h-3" }: { className?: string }) {
   );
 }
 
-function IconPlus({ className = "w-4 h-4" }: { className?: string }) {
+function LockIcon({ className = "w-4 h-4" }: { className?: string }) {
   return (
-    <svg className={className} viewBox="0 0 16 16" fill="none">
-      <path d="M8 3v10M3 8h10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+    <svg className={className} viewBox="0 0 20 20" fill="currentColor">
+      <path fillRule="evenodd" d="M10 1a4.5 4.5 0 00-4.5 4.5V9H5a2 2 0 00-2 2v6a2 2 0 002 2h10a2 2 0 002-2v-6a2 2 0 00-2-2h-.5V5.5A4.5 4.5 0 0010 1zm3 8V5.5a3 3 0 10-6 0V9h6z" clipRule="evenodd" />
     </svg>
   );
 }
-
-function IconX({ className = "w-3 h-3" }: { className?: string }) {
-  return (
-    <svg className={className} viewBox="0 0 16 16" fill="none">
-      <path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-    </svg>
-  );
-}
-
-// ── Page ──────────────────────────────────────────────────────────────────────
 
 export default function SystemsPage() {
   const [selected, setSelected] = useState<string[]>(INITIAL_ACTIVE);
   const [saved, setSaved] = useState<string[]>(INITIAL_ACTIVE);
   const [justSaved, setJustSaved] = useState(false);
+  const { openUpgrade } = useUpgrade();
 
-  // Custom workflows (freeform, not in the preset catalogue)
-  const [customWorkflows, setCustomWorkflows] = useState<{ id: string; label: string }[]>([]);
-  const [customInput, setCustomInput] = useState("");
-
-  const isDirty =
-    JSON.stringify([...selected].sort()) !== JSON.stringify([...saved].sort()) ||
-    customWorkflows.some((cw) => !saved.includes(cw.id));
+  const isDirty = JSON.stringify([...selected].sort()) !== JSON.stringify([...saved].sort());
 
   function toggle(id: string) {
-    setSelected((prev) => (prev.includes(id) ? prev.filter((w) => w !== id) : [...prev, id]));
-    setJustSaved(false);
+    if (selected.includes(id)) {
+      // Always allow deselecting
+      setSelected((prev) => prev.filter((w) => w !== id));
+      setJustSaved(false);
+    } else {
+      // Already have 1 selected — gate
+      openUpgrade();
+    }
   }
 
   function handleSave() {
-    // Ensure all custom workflows that are toggled on are included
     setSaved(selected);
     setJustSaved(true);
     setTimeout(() => setJustSaved(false), 2500);
   }
 
   function handleDiscard() {
-    // Remove custom workflows that were never saved
-    setCustomWorkflows((prev) => prev.filter((cw) => saved.includes(cw.id)));
     setSelected(saved);
     setJustSaved(false);
   }
 
-  function handleAddCustom(e: React.FormEvent) {
-    e.preventDefault();
-    const label = customInput.trim();
-    if (!label) return;
-    const id = `custom-${Date.now()}`;
-    setCustomWorkflows((prev) => [...prev, { id, label }]);
-    setSelected((prev) => [...prev, id]);
-    setCustomInput("");
-    setJustSaved(false);
-  }
-
-  function removeCustom(id: string) {
-    setCustomWorkflows((prev) => prev.filter((cw) => cw.id !== id));
-    setSelected((prev) => prev.filter((w) => w !== id));
-  }
+  const lockedCount = WORKFLOWS.length - 1;
 
   return (
     <>
@@ -114,27 +76,18 @@ export default function SystemsPage() {
             These systems drive what appears in {client.name}&apos;s compliance feed.
           </p>
         </div>
-
-        {/* Save / discard controls */}
         <div className="flex items-center gap-2">
           {justSaved && (
             <span className="flex items-center gap-1.5 text-xs font-medium text-emerald-600">
-              <IconCheck className="w-3.5 h-3.5" />
-              Saved
+              <IconCheck className="w-3.5 h-3.5" /> Saved
             </span>
           )}
           {isDirty && (
             <>
-              <button
-                onClick={handleDiscard}
-                className="text-xs text-slate-500 hover:text-slate-800 border border-slate-200 rounded-lg px-3 py-1.5 bg-white transition-colors"
-              >
+              <button onClick={handleDiscard} className="text-xs text-slate-500 border border-slate-200 rounded-lg px-3 py-1.5 bg-white hover:text-slate-800 transition-colors">
                 Discard
               </button>
-              <button
-                onClick={handleSave}
-                className="text-xs font-medium text-white bg-slate-900 hover:bg-slate-700 rounded-lg px-3 py-1.5 transition-colors"
-              >
+              <button onClick={handleSave} className="text-xs font-medium text-white bg-slate-900 hover:bg-slate-700 rounded-lg px-3 py-1.5 transition-colors">
                 Save changes
               </button>
             </>
@@ -145,48 +98,57 @@ export default function SystemsPage() {
       <main className="flex-1 overflow-y-auto px-6 py-5">
         <div className="flex flex-col gap-5">
 
-          {/* Info banner */}
-          <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
-            <p className="text-xs font-semibold text-blue-800 mb-1">Why this list matters</p>
-            <p className="text-xs text-blue-700 leading-relaxed">
-              Every regulation in your feed was matched because of one or more of these systems.
-              Keeping this list accurate ensures you never miss a relevant update — and never see noise that doesn&apos;t apply to you.
-            </p>
+          {/* Free plan callout */}
+          <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 flex items-start gap-3">
+            <span className="text-amber-500 mt-0.5 shrink-0">
+              <svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M8.485 2.495c.673-1.167 2.357-1.167 3.03 0l6.28 10.875c.673 1.167-.17 2.625-1.516 2.625H3.72c-1.347 0-2.189-1.458-1.515-2.625L8.485 2.495zM10 5a.75.75 0 01.75.75v3.5a.75.75 0 01-1.5 0v-3.5A.75.75 0 0110 5zm0 9a1 1 0 100-2 1 1 0 000 2z" clipRule="evenodd" />
+              </svg>
+            </span>
+            <div>
+              <p className="text-xs font-semibold text-amber-800 mb-0.5">Free plan: 1 AI workflow</p>
+              <p className="text-xs text-amber-700 leading-relaxed">
+                You can track <strong>1 AI system</strong> on your current plan. Upgrade to track all {WORKFLOWS.length} workflow types and get matched to the right regulations for each one.
+              </p>
+            </div>
           </div>
 
           {/* Label + count */}
           <div className="flex items-center justify-between">
-            <p className="text-xs font-semibold text-slate-400 uppercase tracking-wide">
-              Select all AI workflows your company uses
-            </p>
-            <span className="text-xs text-slate-500">{selected.length} active</span>
+            <p className="text-xs font-semibold text-slate-400 uppercase tracking-wide">Your AI workflow</p>
+            <span className="text-xs text-slate-500">{selected.length} / 1 on free plan</span>
           </div>
 
-          {/* Preset workflow grid */}
+          {/* Workflow grid */}
           <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
             {WORKFLOWS.map((w) => {
               const active = selected.includes(w.id);
+              const locked = !active && selected.length >= 1;
+
               return (
                 <button
                   key={w.id}
                   onClick={() => toggle(w.id)}
-                  className={`text-left p-4 rounded-2xl border-2 transition-all duration-150 ${active
+                  className={`text-left p-4 rounded-2xl border-2 transition-all duration-150 relative ${active
                       ? "border-slate-800 bg-slate-50"
-                      : "border-slate-200 bg-white hover:border-slate-400 hover:bg-slate-50"
+                      : locked
+                        ? "border-slate-100 bg-slate-50/50 opacity-60 hover:opacity-80 hover:border-slate-300"
+                        : "border-slate-200 bg-white hover:border-slate-400 hover:bg-slate-50"
                     }`}
                 >
                   <div className="flex items-start justify-between gap-2">
                     <div className="min-w-0">
-                      <p className={`font-semibold text-sm mb-0.5 ${active ? "text-slate-900" : "text-slate-700"}`}>
+                      <p className={`font-semibold text-sm mb-0.5 ${active ? "text-slate-900" : "text-slate-600"}`}>
                         {w.label}
                       </p>
                       <p className="text-xs text-slate-400 leading-snug">{w.desc}</p>
                     </div>
                     <div
-                      className={`w-5 h-5 rounded-full flex items-center justify-center shrink-0 mt-0.5 transition-all ${active ? "bg-slate-800" : "border-2 border-slate-300"
+                      className={`w-5 h-5 rounded-full flex items-center justify-center shrink-0 mt-0.5 transition-all ${active ? "bg-slate-800" : locked ? "bg-slate-100 border border-slate-300" : "border-2 border-slate-300"
                         }`}
                     >
                       {active && <IconCheck className="w-3 h-3 text-white" />}
+                      {locked && <LockIcon className="w-2.5 h-2.5 text-slate-400" />}
                     </div>
                   </div>
                 </button>
@@ -194,91 +156,39 @@ export default function SystemsPage() {
             })}
           </div>
 
-          {/* ── Custom workflows ───────────────────────────────────────── */}
-          <div className="border-t border-slate-100 pt-5 flex flex-col gap-3">
-            <div className="flex items-center justify-between">
-              <p className="text-xs font-semibold text-slate-400 uppercase tracking-wide">
-                Custom workflows
+          {/* Upgrade CTA */}
+          <div
+            onClick={openUpgrade}
+            className="cursor-pointer bg-gradient-to-br from-slate-900 to-indigo-900 rounded-2xl p-6 flex items-center justify-between group hover:shadow-xl transition-all"
+          >
+            <div>
+              <div className="inline-flex items-center gap-1.5 bg-indigo-500/20 border border-indigo-400/30 rounded-full px-2.5 py-1 mb-3">
+                <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-pulse" />
+                <span className="text-xs font-semibold text-indigo-300 uppercase tracking-wide">Unlock all workflows</span>
+              </div>
+              <p className="text-lg font-bold text-white mb-1">
+                Track {lockedCount} more AI systems
               </p>
-              {customWorkflows.length > 0 && (
-                <span className="text-xs text-slate-400">{customWorkflows.length} added</span>
-              )}
-            </div>
-            <p className="text-xs text-slate-500 -mt-1">
-              Don&apos;t see your workflow above? Add it here so it can be matched against relevant regulations.
-            </p>
-
-            {/* Existing custom cards */}
-            {customWorkflows.length > 0 && (
-              <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
-                {customWorkflows.map((cw) => (
-                  <div
-                    key={cw.id}
-                    className="relative text-left p-4 rounded-2xl border-2 border-slate-800 bg-slate-50 flex items-start justify-between gap-2 group"
-                  >
-                    <div className="min-w-0">
-                      <p className="font-semibold text-sm text-slate-900 mb-0.5">{cw.label}</p>
-                      <p className="text-xs text-slate-400 leading-snug">Custom workflow</p>
-                    </div>
-                    <div className="flex flex-col items-end gap-1 shrink-0">
-                      <div className="w-5 h-5 rounded-full bg-slate-800 flex items-center justify-center">
-                        <IconCheck className="w-3 h-3 text-white" />
-                      </div>
-                      <button
-                        onClick={() => removeCustom(cw.id)}
-                        className="text-slate-300 hover:text-red-500 transition-colors mt-1"
-                        title="Remove"
-                      >
-                        <IconX className="w-3 h-3" />
-                      </button>
-                    </div>
-                  </div>
+              <p className="text-sm text-slate-300 max-w-sm leading-relaxed">
+                Every system you use generates unique compliance obligations. Don&apos;t leave{" "}
+                <span className="text-white font-semibold">{lockedCount} workflows unmonitored</span>.
+              </p>
+              <div className="flex items-center gap-4 mt-4">
+                {["Unlimited workflows", "Real-time alerts", "Expert introductions"].map((f) => (
+                  <span key={f} className="flex items-center gap-1 text-xs text-slate-300">
+                    <IconCheck className="w-3 h-3 text-emerald-400" />
+                    {f}
+                  </span>
                 ))}
               </div>
-            )}
-
-            {/* Add custom workflow form */}
-            <form onSubmit={handleAddCustom} className="flex items-center gap-2 max-w-lg">
-              <input
-                type="text"
-                value={customInput}
-                onChange={(e) => setCustomInput(e.target.value)}
-                placeholder="e.g. AI-assisted loan underwriting"
-                className="flex-1 text-sm border border-slate-200 rounded-xl px-4 py-2.5 text-slate-800 placeholder:text-slate-300 focus:outline-none focus:ring-2 focus:ring-slate-800 focus:border-transparent bg-white transition"
-              />
-              <button
-                type="submit"
-                disabled={!customInput.trim()}
-                className="flex items-center gap-1.5 text-xs font-medium text-white bg-slate-900 hover:bg-slate-700 disabled:opacity-40 disabled:cursor-not-allowed rounded-xl px-4 py-2.5 transition-colors shrink-0"
-              >
-                <IconPlus className="w-3.5 h-3.5" />
-                Add workflow
-              </button>
-            </form>
-          </div>
-
-          {/* Bottom save bar */}
-          {isDirty && (
-            <div className="flex items-center justify-between bg-slate-900 text-white rounded-xl px-5 py-3.5">
-              <p className="text-sm font-medium">
-                {selected.length} workflow{selected.length !== 1 ? "s" : ""} selected
-              </p>
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={handleDiscard}
-                  className="text-xs text-slate-400 hover:text-white transition-colors px-3 py-1.5"
-                >
-                  Discard
-                </button>
-                <button
-                  onClick={handleSave}
-                  className="text-xs font-semibold bg-white text-slate-900 hover:bg-slate-100 rounded-lg px-4 py-1.5 transition-colors"
-                >
-                  Save & update feed →
-                </button>
-              </div>
             </div>
-          )}
+            <div className="shrink-0 ml-6">
+              <div className="bg-white text-slate-900 font-bold text-sm px-5 py-3 rounded-xl group-hover:scale-105 transition-transform shadow-lg">
+                Upgrade →
+              </div>
+              <p className="text-xs text-slate-400 text-center mt-2">14-day free trial</p>
+            </div>
+          </div>
 
         </div>
       </main>

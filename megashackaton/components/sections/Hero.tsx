@@ -2,9 +2,9 @@ import { LinkButton } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
 
 const recentUpdates = [
-  { tag: "NEW",    color: "bg-slate-700 text-slate-100",  text: "EU AI Act — Art. 22 obligations for automated HR decisions" },
-  { tag: "UPDATE", color: "bg-slate-600 text-slate-200",  text: "CCPA Amendment — expanded employee data rights (effective Q1)" },
-  { tag: "ALERT",  color: "bg-red-900 text-red-200",      text: "UK Worker Protection Act — AI monitoring disclosure deadline" },
+  { tag: "NEW", color: "bg-slate-700 text-slate-100", text: "EU AI Act — Art. 22 obligations for automated HR decisions" },
+  { tag: "UPDATE", color: "bg-slate-600 text-slate-200", text: "CCPA Amendment — expanded employee data rights (effective Q1)" },
+  { tag: "ALERT", color: "bg-red-900 text-red-200", text: "UK Worker Protection Act — AI monitoring disclosure deadline" },
 ];
 
 export function Hero() {
@@ -33,10 +33,10 @@ export function Hero() {
         {/* CTAs */}
         <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mb-20">
           <LinkButton href="/onboarding" variant="primary" size="lg" className="bg-white text-slate-900 border-white hover:bg-slate-100 hover:border-slate-100">
-            Start your assessment
+            Start onboarding
           </LinkButton>
-          <LinkButton href="#features" size="lg" className="btn btn-lg text-slate-300 border border-slate-700 hover:bg-slate-800 rounded-full">
-            See how it works
+          <LinkButton href="/dashboard" size="lg" className="btn btn-lg text-slate-300 border border-slate-700 hover:bg-slate-800 rounded-full">
+            Go to Dashboard →
           </LinkButton>
         </div>
 
@@ -71,8 +71,8 @@ export function Hero() {
               <div className="grid grid-cols-3 gap-3">
                 {[
                   { label: "Active Regulations", value: "24" },
-                  { label: "New This Week",       value: "3"  },
-                  { label: "Compliance Score",    value: "91%" },
+                  { label: "New This Week", value: "3" },
+                  { label: "Compliance Score", value: "91%" },
                 ].map((stat) => (
                   <div key={stat.label} className="bg-slate-800 rounded-xl border border-slate-700 p-3">
                     <p className="text-xs text-slate-500 mb-1">{stat.label}</p>
