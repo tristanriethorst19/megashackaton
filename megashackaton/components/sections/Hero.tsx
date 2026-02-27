@@ -2,9 +2,9 @@ import { LinkButton } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
 
 const recentUpdates = [
-  { tag: "NEW", color: "bg-slate-700 text-slate-100", text: "EU AI Act — Art. 22 obligations for automated HR decisions" },
-  { tag: "UPDATE", color: "bg-slate-600 text-slate-200", text: "CCPA Amendment — expanded employee data rights (effective Q1)" },
-  { tag: "ALERT", color: "bg-red-900 text-red-200", text: "UK Worker Protection Act — AI monitoring disclosure deadline" },
+  { tag: "NEW", color: "bg-slate-700 text-slate-100", text: "EU AI Act — Art. 22 high-risk classification for AI credit scoring models" },
+  { tag: "UPDATE", color: "bg-slate-600 text-slate-200", text: "DORA — ICT risk management obligations now apply to AI-driven trading systems" },
+  { tag: "ALERT", color: "bg-red-900 text-red-200", text: "MiCA — crypto-asset AI tools face new disclosure deadline next quarter" },
 ];
 
 export function Hero() {
@@ -15,19 +15,20 @@ export function Hero() {
         {/* Eyebrow badge */}
         <div className="flex justify-center mb-8">
           <Badge variant="primary">
-            ✦ EU AI Act · CCPA · Worker Protection · Updated Daily
+            ✦ EU AI Act · MiCA · DORA · Basel AI · Updated Daily
           </Badge>
         </div>
 
         {/* Headline */}
         <h1 className="heading-1 text-white max-w-3xl mx-auto mb-7">
-          Stay ahead of AI &amp;<br className="hidden sm:block" /> automation compliance
+          AI compliance built for<br className="hidden sm:block" /> FinTech companies
         </h1>
 
         {/* Subtext */}
         <p className="body-lg text-slate-400 max-w-lg mx-auto mb-10">
-          Complai monitors every new law, directive, and ruling that affects your
-          AI-driven workforce — then connects you to the right experts to act on it.
+          Complai tracks every regulation that affects your credit scoring models,
+          fraud detection systems, and algorithmic trading — then connects you to
+          the right experts before regulators come knocking.
         </p>
 
         {/* CTAs */}

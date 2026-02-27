@@ -27,6 +27,7 @@ export type FeedItem = {
   daysLeft: number | null;
   status: FeedStatus;
   action: string;
+  affectedWorkflows: { name: string; risk: "high" | "medium" | "low" }[];
 };
 
 export const feed: FeedItem[] = [
@@ -44,6 +45,10 @@ export const feed: FeedItem[] = [
     daysLeft: 16,
     status: "action-required",
     action: "Register system",
+    affectedWorkflows: [
+      { name: "Automated CV screening (Workday AI)", risk: "high" },
+      { name: "AI performance monitoring", risk: "medium" },
+    ],
   },
   {
     id: "2",
@@ -59,6 +64,11 @@ export const feed: FeedItem[] = [
     daysLeft: null,
     status: "in-review",
     action: "Review & assign owner",
+    affectedWorkflows: [
+      { name: "Automated CV screening (Workday AI)", risk: "high" },
+      { name: "AI performance monitoring", risk: "high" },
+      { name: "Payroll automation", risk: "low" },
+    ],
   },
   {
     id: "3",
@@ -74,6 +84,11 @@ export const feed: FeedItem[] = [
     daysLeft: null,
     status: "in-review",
     action: "Read guidance",
+    affectedWorkflows: [
+      { name: "Automated CV screening (Workday AI)", risk: "high" },
+      { name: "AI performance monitoring", risk: "medium" },
+      { name: "Payroll automation", risk: "medium" },
+    ],
   },
   {
     id: "4",
@@ -89,6 +104,9 @@ export const feed: FeedItem[] = [
     daysLeft: null,
     status: "action-required",
     action: "Add disclosure notice",
+    affectedWorkflows: [
+      { name: "HR chatbot (internal)", risk: "high" },
+    ],
   },
   {
     id: "5",
@@ -104,6 +122,12 @@ export const feed: FeedItem[] = [
     daysLeft: null,
     status: "compliant",
     action: "View record",
+    affectedWorkflows: [
+      { name: "Automated CV screening (Workday AI)", risk: "medium" },
+      { name: "AI performance monitoring", risk: "low" },
+      { name: "Payroll automation", risk: "low" },
+      { name: "HR chatbot (internal)", risk: "low" },
+    ],
   },
 ];
 

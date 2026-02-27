@@ -15,19 +15,20 @@ export function Testimonial() {
 
           {/* Quote */}
           <blockquote className="text-xl font-medium text-slate-900 leading-relaxed mb-8">
-            &ldquo;When the EU AI Act dropped, we had no idea which of our systems were
-            in scope. Complai had a tailored impact summary in our inbox within the hour —
-            and connected us to a specialist who had us audit-ready in two weeks.&rdquo;
+            &ldquo;When DORA came into force, we had three AI-driven trading systems
+            we weren&apos;t sure were in scope. Complai mapped every obligation within
+            the hour and matched us with a specialist who got us fully compliant before
+            the deadline — without disrupting a single workflow.&rdquo;
           </blockquote>
 
           {/* Author */}
           <div className="flex items-center justify-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-slate-600 to-slate-800 flex items-center justify-center text-white font-semibold text-sm">
-              LC
+            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-600 to-violet-700 flex items-center justify-center text-white font-semibold text-sm">
+              MV
             </div>
             <div className="text-left">
-              <p className="text-sm font-semibold text-slate-900">Laura Chen</p>
-              <p className="text-sm text-slate-500">Chief Compliance Officer at Siemens</p>
+              <p className="text-sm font-semibold text-slate-900">Marc Veltman</p>
+              <p className="text-sm text-slate-500">Head of Compliance at Nuvei Europe</p>
             </div>
           </div>
         </div>
