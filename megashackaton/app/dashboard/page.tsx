@@ -1,5 +1,6 @@
+import Link from "next/link";
 import { client, feed } from "./data";
-import type { FeedStatus } from "./data";
+import type { FeedItem, FeedStatus } from "./data";
 
 const accentClass: Record<FeedStatus, string> = {
   "action-required": "bg-red-400",
@@ -7,25 +8,58 @@ const accentClass: Record<FeedStatus, string> = {
   "compliant":       "bg-emerald-400",
 };
 
-const actionButtonClass: Record<FeedStatus, string> = {
-  "action-required": "bg-slate-900 text-white hover:bg-slate-700",
-  "in-review":       "bg-slate-100 text-slate-700 hover:bg-slate-200",
-  "compliant":       "bg-slate-100 text-slate-500 hover:bg-slate-200",
-};
+const groups: { status: FeedStatus; label: string; labelClass: string; dotClass: string }[] = [
+  { status: "action-required", label: "Action required", labelClass: "text-red-600",   dotClass: "bg-red-400"     },
+  { status: "in-review",       label: "In review",       labelClass: "text-amber-600", dotClass: "bg-amber-400"   },
+  { status: "compliant",       label: "Compliant",       labelClass: "text-slate-400", dotClass: "bg-emerald-400" },
+];
 
-function StatusChip({ status }: { status: FeedStatus }) {
-  if (status === "compliant")
-    return <span className="inline-flex items-center gap-1.5 text-xs font-medium text-emerald-600"><span className="w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0" />Compliant</span>;
-  if (status === "in-review")
-    return <span className="inline-flex items-center gap-1.5 text-xs font-medium text-amber-600"><span className="w-1.5 h-1.5 rounded-full bg-amber-400 shrink-0" />In review</span>;
-  return <span className="inline-flex items-center gap-1.5 text-xs font-medium text-red-600"><span className="w-1.5 h-1.5 rounded-full bg-red-400 shrink-0" />Action required</span>;
+function FeedCard({ item }: { item: FeedItem }) {
+  return (
+    <Link href={`/dashboard/item/${item.id}`} className="block group">
+      <div className={`flex bg-white rounded-xl border overflow-hidden transition-shadow group-hover:shadow-md ${
+        item.status === "action-required" ? "border-red-200" : "border-slate-200"
+      }`}>
+        {/* Left accent */}
+        <div className={`w-[3px] shrink-0 ${accentClass[item.status]}`} />
+
+        {/* Content */}
+        <div className="flex-1 px-5 py-4">
+          {/* Type + urgency — only what's essential */}
+          <div className="flex items-center gap-2 mb-2.5">
+            <span className={`text-xs font-semibold px-2 py-0.5 rounded-md border ${item.typeClass}`}>
+              {item.type}
+            </span>
+            {item.daysLeft && (
+              <span className="text-xs font-bold text-red-600">
+                {item.daysLeft} days left
+              </span>
+            )}
+          </div>
+
+          {/* Title */}
+          <h3 className="text-sm font-semibold text-slate-900 leading-snug mb-1.5">
+            {item.title}
+          </h3>
+
+          {/* One-line teaser */}
+          <p className="text-xs text-slate-500 leading-relaxed line-clamp-2">
+            {item.summary}
+          </p>
+        </div>
+
+        {/* Right: arrow affordance */}
+        <div className="flex items-center pr-4 pl-2 text-slate-300 group-hover:text-slate-500 transition-colors">
+          <svg width="14" height="14" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="2">
+            <polyline points="9 18 15 12 9 6" />
+          </svg>
+        </div>
+      </div>
+    </Link>
+  );
 }
 
 export default function FeedPage() {
-  const requireAction = feed.filter((f) => f.status === "action-required").length;
-  const inReview      = feed.filter((f) => f.status === "in-review").length;
-  const compliant     = feed.filter((f) => f.status === "compliant").length;
-
   return (
     <>
       {/* Header */}
@@ -49,88 +83,37 @@ export default function FeedPage() {
       {/* Body */}
       <main className="flex-1 overflow-y-auto px-8 py-6">
 
-        {/* Inline stats strip */}
-        <div className="flex items-center justify-between mb-5">
-          <div className="flex items-center gap-3 text-sm">
-            <span className="font-semibold text-red-600">{requireAction} require action</span>
-            <span className="text-slate-300">·</span>
-            <span className="font-semibold text-amber-600">{inReview} in review</span>
-            <span className="text-slate-300">·</span>
-            <span className="font-semibold text-emerald-600">{compliant} compliant</span>
-          </div>
-          <span className="text-xs text-slate-400">{feed.length} items matched for {client.locations[0]}</span>
-        </div>
-
-        {/* Feed — unified container, article-list style */}
-        <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden divide-y divide-slate-100 mb-8">
-          {feed.map((item) => (
-            <div
-              key={item.id}
-              className={`flex group transition-colors cursor-pointer ${
-                item.status === "compliant" ? "hover:bg-slate-50/60" : "hover:bg-slate-50"
-              }`}
-            >
-              {/* Left accent bar — color signals urgency at a glance */}
-              <div className={`w-[3px] shrink-0 ${accentClass[item.status]} ${item.status === "compliant" ? "opacity-40" : ""}`} />
-
-              {/* Content */}
-              <div className={`flex-1 px-7 py-6 ${item.status === "compliant" ? "opacity-70" : ""}`}>
-
-                {/* Row 1: type badge + meta + status chip */}
-                <div className="flex items-center justify-between mb-3">
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <span className={`text-xs font-semibold px-2 py-0.5 rounded-md border ${item.typeClass}`}>
-                      {item.type}
-                    </span>
-                    <span className="text-xs text-slate-400">{item.jurisdiction}</span>
-                    {item.daysLeft && (
-                      <span className="text-xs font-bold text-red-600 bg-red-50 border border-red-200 px-2 py-0.5 rounded-md">
-                        {item.daysLeft} days left
-                      </span>
-                    )}
-                  </div>
-                  <StatusChip status={item.status} />
+        {/* Priority groups */}
+        <div className="flex flex-col gap-8 max-w-2xl">
+          {groups.map(({ status, label, labelClass, dotClass }) => {
+            const items = feed.filter((f) => f.status === status);
+            if (items.length === 0) return null;
+            return (
+              <section key={status}>
+                {/* Group heading */}
+                <div className="flex items-center gap-2 mb-3">
+                  <span className={`w-2 h-2 rounded-full shrink-0 ${dotClass}`} />
+                  <h2 className={`text-xs font-semibold uppercase tracking-wide ${labelClass}`}>
+                    {label}
+                  </h2>
+                  <span className="text-xs text-slate-300 font-normal">{items.length}</span>
                 </div>
 
-                {/* Title — article-sized */}
-                <h3 className="text-base font-semibold text-slate-900 leading-snug mb-2">
-                  {item.title}
-                </h3>
-
-                {/* Summary — 2 lines max, click to read more */}
-                <p className="text-sm text-slate-500 leading-relaxed mb-3 line-clamp-2">
-                  {item.summary}
-                </p>
-
-                {/* Matched because — personalization signal, inline and subtle */}
-                <p className="text-xs text-slate-400 mb-5">
-                  <span className="font-medium text-slate-500">Matched because:</span>{" "}
-                  {item.whyShort}
-                </p>
-
-                {/* Footer */}
-                <div className="flex items-center justify-between">
-                  <span className="text-xs text-slate-400">Effective {item.effective}</span>
-                  <div className="flex items-center gap-2">
-                    <button className="text-xs text-slate-400 hover:text-slate-700 transition-colors">
-                      Full details →
-                    </button>
-                    <button
-                      className={`text-xs font-medium px-3 py-1.5 rounded-lg transition-colors ${actionButtonClass[item.status]}`}
-                    >
-                      {item.action}
-                    </button>
-                  </div>
+                {/* Cards */}
+                <div className="flex flex-col gap-2">
+                  {items.map((item) => (
+                    <FeedCard key={item.id} item={item} />
+                  ))}
                 </div>
-              </div>
-            </div>
-          ))}
+              </section>
+            );
+          })}
         </div>
 
-        {/* How we filter — single quiet line at the bottom */}
-        <p className="text-xs text-slate-400 leading-relaxed">
+        {/* How we filter — quiet note at the bottom */}
+        <p className="text-xs text-slate-400 leading-relaxed max-w-2xl mt-10">
           <span className="font-medium text-slate-500">How we filter:</span>{" "}
-          We match against your jurisdictions ({client.locations.join(", ")}), AI systems in use, and industry across 200+ regulatory sources monitored daily — EU Official Journal, member state transpositions, agency guidance, and court rulings.
+          Matched against your jurisdictions ({client.locations.join(", ")}), AI systems in use, and industry across 200+ regulatory sources monitored daily.
         </p>
 
       </main>
