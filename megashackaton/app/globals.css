@@ -6,9 +6,9 @@
 
    Colour tokens
    ─────────────
-   Primary:    blue-600  (#2563eb)  — CTAs, links, focus rings
+   Primary:    slate-800 (#1e293b)  — CTAs, links, focus rings
    Surface:    white / slate-50 / slate-100
-   Dark bg:    slate-900 (#0f172a)  — CTA section, footer
+   Dark bg:    slate-950 (#020617)  — hero, CTA section, footer
    Text:       slate-900 / slate-600 / slate-400
    Border:     slate-200
 
@@ -35,14 +35,14 @@
 
 /* ── CSS custom properties (runtime themeable) ── */
 :root {
-  --color-primary:       #2563eb;
-  --color-primary-light: #eff6ff;
-  --color-primary-dark:  #1d4ed8;
+  --color-primary:       #1e293b;
+  --color-primary-light: #f1f5f9;
+  --color-primary-dark:  #0f172a;
 
   --surface-page:        #ffffff;
   --surface-secondary:   #f8fafc;
-  --surface-dark:        #0f172a;
-  --surface-dark-2:      #1e293b;
+  --surface-dark:        #020617;
+  --surface-dark-2:      #0f172a;
 
   --text-default:        #0f172a;
   --text-secondary:      #475569;
@@ -118,12 +118,12 @@ body {
   background-color: var(--color-primary);
   color: #ffffff;
   border: 1px solid var(--color-primary);
-  box-shadow: 0 1px 3px rgba(37,99,235,0.3), 0 0 0 0 rgba(37,99,235,0);
+  box-shadow: 0 1px 3px rgba(15,23,42,0.2), 0 0 0 0 rgba(15,23,42,0);
 }
 .btn-primary:hover {
   background-color: var(--color-primary-dark);
   border-color: var(--color-primary-dark);
-  box-shadow: 0 4px 12px rgba(37,99,235,0.35);
+  box-shadow: 0 4px 12px rgba(15,23,42,0.3);
 }
 
 .btn-secondary {
@@ -159,7 +159,7 @@ body {
   font-size: 0.8125rem;
   font-weight: 500;
 }
-.badge-primary  { background-color: var(--color-primary-light); color: var(--color-primary); }
+.badge-primary  { background-color: rgba(255,255,255,0.12); color: #e2e8f0; border: 1px solid rgba(255,255,255,0.2); }
 .badge-neutral  { background-color: var(--surface-secondary); color: var(--text-secondary); border: 1px solid var(--border); }
 
 /* Form inputs */
@@ -176,7 +176,7 @@ body {
 }
 .input:focus {
   border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+  box-shadow: 0 0 0 3px rgba(30, 41, 59, 0.12);
 }
 .input::placeholder { color: var(--text-muted); }
 

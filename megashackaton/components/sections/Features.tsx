@@ -63,13 +63,13 @@ const features = [
 
 export function Features() {
   return (
-    <section id="features" className="section bg-white">
+    <section id="features" className="section bg-white pt-32">
       <div className="container-narrow">
 
         {/* Header */}
         <div className="text-center mb-14">
           <p className="label text-slate-400 mb-3">How It Works</p>
-          <h2 className="heading-2 text-slate-900 max-w-xl mx-auto mb-4">
+          <h2 className="text-lg font-semibold text-slate-900 max-w-xl mx-auto mb-4">
             Everything you need to stay compliant
           </h2>
           <p className="body-lg text-slate-500 max-w-lg mx-auto">
@@ -82,7 +82,7 @@ export function Features() {
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {features.map((f) => (
             <div key={f.title} className="card transition-shadow duration-200">
-              <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center mb-4">
+              <div className="w-10 h-10 rounded-xl bg-slate-100 text-slate-700 flex items-center justify-center mb-4">
                 {f.icon}
               </div>
               <h3 className="heading-3 text-slate-900 mb-2">{f.title}</h3>

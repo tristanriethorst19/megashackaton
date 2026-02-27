@@ -10,7 +10,7 @@ const frameworks = [
 
 export function LogoBar() {
   return (
-    <section className="section-sm border-y border-slate-100 bg-slate-50">
+    <section className="section-sm border-y border-slate-200 bg-slate-50">
       <div className="container-narrow text-center">
         <p className="label text-slate-400 mb-8">Covering regulations across every major jurisdiction</p>
         <div className="flex flex-wrap items-center justify-center gap-x-12 gap-y-6">

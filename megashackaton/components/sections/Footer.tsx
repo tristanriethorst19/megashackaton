@@ -19,7 +19,7 @@ const columns = [
 
 export function Footer() {
   return (
-    <footer className="bg-slate-900 border-t border-slate-800">
+    <footer className="bg-slate-950 border-t border-slate-800">
       <div className="container-narrow py-16">
 
         {/* Top row */}
@@ -27,11 +27,8 @@ export function Footer() {
 
           {/* Brand */}
           <div className="col-span-2 md:col-span-1">
-            <a href="/" className="flex items-center gap-2 font-semibold text-white text-lg mb-3">
-              <span className="w-7 h-7 rounded-lg bg-blue-600 flex items-center justify-center text-white text-sm font-bold">
-                C
-              </span>
-              Complio
+            <a href="/" className="flex items-center mb-3">
+              <img src="/Vector-white.svg" alt="Complai" className="h-6 w-auto" />
             </a>
             <p className="text-sm text-slate-400 leading-relaxed">
               AI &amp; automation compliance, simplified.
@@ -62,7 +59,7 @@ export function Footer() {
 
         {/* Bottom row */}
         <div className="border-t border-slate-800 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-slate-500">
-          <p>© {new Date().getFullYear()} Complio. All rights reserved.</p>
+          <p>© {new Date().getFullYear()} Complai. All rights reserved.</p>
           <div className="flex gap-6">
             <a href="#" className="hover:text-slate-300 transition-colors">Privacy</a>
             <a href="#" className="hover:text-slate-300 transition-colors">Terms</a>

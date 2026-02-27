@@ -15,15 +15,12 @@ export function Navbar() {
 
   return (
     <div className="fixed top-4 inset-x-0 z-50 flex justify-center px-4">
-      <header className="w-full max-w-4xl bg-white/90 backdrop-blur-md border border-slate-200 rounded-2xl shadow-sm">
+      <header className="w-full max-w-4xl bg-white/95 backdrop-blur-md border border-slate-200 rounded-2xl shadow-sm">
         <nav className="flex items-center justify-between px-5 h-14">
 
           {/* Logo */}
-          <a href="/" className="flex items-center gap-2 font-semibold text-slate-900 text-base">
-            <span className="w-6 h-6 rounded-md bg-blue-600 flex items-center justify-center text-white text-xs font-bold">
-              C
-            </span>
-            Complio
+          <a href="/" className="flex items-center">
+            <img src="/Vector.svg" alt="Complai" className="h-5 w-auto" />
           </a>
 
           {/* Desktop links */}

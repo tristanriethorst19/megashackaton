@@ -8,9 +8,9 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Complio — AI & Automation Compliance Intelligence",
+  title: "Complai — AI & Automation Compliance Intelligence",
   description:
-    "Stay ahead of AI and automation workforce regulations. Complio monitors global laws, scores your compliance posture, and connects you to the right experts to act.",
+    "Stay ahead of AI and automation workforce regulations. Complai monitors global laws, scores your compliance posture, and connects you to the right experts to act.",
 };
 
 export default function RootLayout({
