@@ -26,16 +26,16 @@ interface Risk {
 // ── Static data ─────────────────────────────────────────────────────────────
 
 const WORKFLOWS = [
-  { id: "support-chatbot",        label: "Customer support chatbot",    desc: "AI handling inbound customer queries" },
-  { id: "cv-screening",           label: "Automated CV screening",      desc: "Resume parsing & candidate ranking" },
-  { id: "performance-monitoring", label: "AI performance monitoring",   desc: "Employee productivity tracking" },
-  { id: "customer-comms",         label: "Automated communications",    desc: "AI-generated emails & messages at scale" },
-  { id: "document-processing",    label: "Document processing",         desc: "Contracts, forms & invoices" },
-  { id: "hiring-decisions",       label: "AI-assisted hiring",         desc: "Scoring or shortlisting candidates" },
-  { id: "payroll-automation",     label: "Payroll automation",         desc: "Automated compensation calculations" },
-  { id: "financial-analysis",     label: "AI financial scoring",       desc: "Credit, risk, or fraud detection" },
-  { id: "content-generation",     label: "Content generation",         desc: "Marketing copy, reports, summaries" },
-  { id: "data-analytics",         label: "Automated analytics",        desc: "BI pipelines & dashboards" },
+  { id: "support-chatbot", label: "Customer support chatbot", desc: "AI handling inbound customer queries" },
+  { id: "cv-screening", label: "Automated CV screening", desc: "Resume parsing & candidate ranking" },
+  { id: "performance-monitoring", label: "AI performance monitoring", desc: "Employee productivity tracking" },
+  { id: "customer-comms", label: "Automated communications", desc: "AI-generated emails & messages at scale" },
+  { id: "document-processing", label: "Document processing", desc: "Contracts, forms & invoices" },
+  { id: "hiring-decisions", label: "AI-assisted hiring", desc: "Scoring or shortlisting candidates" },
+  { id: "payroll-automation", label: "Payroll automation", desc: "Automated compensation calculations" },
+  { id: "financial-analysis", label: "AI financial scoring", desc: "Credit, risk, or fraud detection" },
+  { id: "content-generation", label: "Content generation", desc: "Marketing copy, reports, summaries" },
+  { id: "data-analytics", label: "Automated analytics", desc: "BI pipelines & dashboards" },
 ];
 
 const DISCOVERY_STEPS = [
@@ -373,13 +373,28 @@ function ProfileStep({
 
 function WorkflowsStep({
   selected,
+  customWorkflows,
   onToggle,
+  onAddCustom,
   onAnalyze,
 }: {
   selected: string[];
+  customWorkflows: { id: string; label: string; desc: string }[];
   onToggle: (id: string) => void;
+  onAddCustom: (label: string) => void;
   onAnalyze: () => void;
 }) {
+  const [addingCustom, setAddingCustom] = useState(false);
+  const [customInput, setCustomInput] = useState("");
+
+  function handleAddCustom() {
+    if (customInput.trim()) {
+      onAddCustom(customInput.trim());
+      setCustomInput("");
+    }
+    setAddingCustom(false);
+  }
+
   return (
     <div className="w-full max-w-2xl">
       <div className="text-center mb-8">
@@ -390,17 +405,17 @@ function WorkflowsStep({
       </div>
 
       <div className="grid grid-cols-2 gap-3 mb-8">
+        {/* Pre-defined workflow tiles */}
         {WORKFLOWS.map((w) => {
           const active = selected.includes(w.id);
           return (
             <button
               key={w.id}
               onClick={() => onToggle(w.id)}
-              className={`text-left p-4 rounded-2xl border-2 transition-all duration-150 ${
-                active
+              className={`text-left p-4 rounded-2xl border-2 transition-all duration-150 ${active
                   ? "border-slate-800 bg-slate-50"
                   : "border-slate-200 bg-white hover:border-slate-400 hover:bg-slate-50"
-              }`}
+                }`}
             >
               <div className="flex items-start justify-between gap-2">
                 <div className="min-w-0">
@@ -410,9 +425,8 @@ function WorkflowsStep({
                   <p className="text-xs text-slate-400 leading-snug">{w.desc}</p>
                 </div>
                 <div
-                  className={`w-5 h-5 rounded-full flex items-center justify-center shrink-0 mt-0.5 transition-all ${
-                    active ? "bg-slate-800" : "border-2 border-slate-300"
-                  }`}
+                  className={`w-5 h-5 rounded-full flex items-center justify-center shrink-0 mt-0.5 transition-all ${active ? "bg-slate-800" : "border-2 border-slate-300"
+                    }`}
                 >
                   {active && <IconCheck className="w-3 h-3 text-white" />}
                 </div>
@@ -420,6 +434,80 @@ function WorkflowsStep({
             </button>
           );
         })}
+
+        {/* Custom workflow tiles (already added) */}
+        {customWorkflows.map((w) => {
+          const active = selected.includes(w.id);
+          return (
+            <button
+              key={w.id}
+              onClick={() => onToggle(w.id)}
+              className={`text-left p-4 rounded-2xl border-2 transition-all duration-150 ${active
+                  ? "border-slate-800 bg-slate-50"
+                  : "border-slate-200 bg-white hover:border-slate-400 hover:bg-slate-50"
+                }`}
+            >
+              <div className="flex items-start justify-between gap-2">
+                <div className="min-w-0">
+                  <p className={`font-semibold text-sm mb-0.5 ${active ? "text-slate-900" : "text-slate-700"}`}>
+                    {w.label}
+                  </p>
+                  <p className="text-xs text-slate-400 leading-snug">Custom workflow</p>
+                </div>
+                <div
+                  className={`w-5 h-5 rounded-full flex items-center justify-center shrink-0 mt-0.5 transition-all ${active ? "bg-slate-800" : "border-2 border-slate-300"
+                    }`}
+                >
+                  {active && <IconCheck className="w-3 h-3 text-white" />}
+                </div>
+              </div>
+            </button>
+          );
+        })}
+
+        {/* Add custom tile */}
+        {addingCustom ? (
+          <div className="p-4 rounded-2xl border-2 border-slate-800 bg-slate-50 flex flex-col gap-2">
+            <input
+              autoFocus
+              className="input text-sm"
+              placeholder="e.g. AI invoice matching"
+              value={customInput}
+              onChange={(e) => setCustomInput(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") handleAddCustom();
+                if (e.key === "Escape") { setAddingCustom(false); setCustomInput(""); }
+              }}
+            />
+            <div className="flex gap-2">
+              <button
+                className="btn btn-primary flex-1 text-xs py-1.5"
+                onClick={handleAddCustom}
+              >
+                Add
+              </button>
+              <button
+                className="btn btn-secondary text-xs py-1.5 px-3"
+                onClick={() => { setAddingCustom(false); setCustomInput(""); }}
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        ) : (
+          <button
+            onClick={() => setAddingCustom(true)}
+            className="text-left p-4 rounded-2xl border-2 border-dashed border-slate-300 bg-white hover:border-slate-400 hover:bg-slate-50 transition-all duration-150 flex items-center gap-3"
+          >
+            <div className="w-5 h-5 rounded-full border-2 border-slate-300 flex items-center justify-center shrink-0 text-slate-400 text-lg leading-none">
+              +
+            </div>
+            <div>
+              <p className="font-semibold text-sm text-slate-500">Add custom workflow</p>
+              <p className="text-xs text-slate-400 leading-snug">Not listed above?</p>
+            </div>
+          </button>
+        )}
       </div>
 
       <button
@@ -444,23 +532,38 @@ function WorkflowsStep({
 
 // ── Step 4: Analyzing ───────────────────────────────────────────────────────
 
-function AnalyzingStep({ progress, stage }: { progress: number; stage: string }) {
+function AnalyzingStep({ stageIndex }: { stageIndex: number }) {
   return (
-    <div className="w-full max-w-sm text-center">
-      <div className="w-16 h-16 rounded-2xl bg-slate-900 text-white flex items-center justify-center mx-auto mb-6">
-        <IconShield className="w-8 h-8" />
+    <div className="w-full max-w-lg">
+      <div className="text-center mb-8">
+        <h2 className="text-3xl font-bold text-slate-900 tracking-tight mb-2">Analysing your workflows</h2>
+        <p className="text-slate-500">Cross-referencing 40+ AI &amp; automation regulations</p>
       </div>
 
-      <h2 className="text-2xl font-bold text-slate-900 mb-2">Analysing your workflows</h2>
-      <p className="text-slate-500 text-sm mb-8 min-h-[1.25rem] transition-all duration-300">{stage}</p>
-
-      <div className="w-full h-2 bg-slate-100 rounded-full overflow-hidden mb-3">
-        <div
-          className="h-full bg-slate-800 rounded-full transition-all duration-100 ease-linear"
-          style={{ width: `${progress}%` }}
-        />
+      {/* Live analysis feed */}
+      <div className="card mb-6 divide-y divide-slate-50 py-2">
+        {ANALYSIS_STAGES.map((text, i) => {
+          if (i < stageIndex) {
+            return (
+              <div key={i} className="flex items-center gap-3 py-2.5 px-2">
+                <div className="w-5 h-5 rounded-full bg-emerald-100 flex items-center justify-center shrink-0">
+                  <IconCheck className="w-3 h-3 text-emerald-600" />
+                </div>
+                <span className="text-sm text-slate-600">{text}</span>
+              </div>
+            );
+          }
+          if (i === stageIndex) {
+            return (
+              <div key={i} className="flex items-center gap-3 py-2.5 px-2">
+                <div className="w-5 h-5 rounded-full border-2 border-slate-300 border-t-slate-700 animate-spin shrink-0" />
+                <span className="text-sm text-slate-400">{text}</span>
+              </div>
+            );
+          }
+          return null;
+        })}
       </div>
-      <p className="text-sm text-slate-400">{Math.round(progress)}% complete</p>
     </div>
   );
 }
@@ -516,9 +619,8 @@ function ResultsStep({ risks, profile }: { risks: Risk[]; profile: CompanyProfil
             <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
               <div className="flex items-center gap-2">
                 <span
-                  className={`label px-2.5 py-1 rounded-lg ${
-                    risk.severity === "HIGH" ? "bg-red-100 text-red-700" : "bg-amber-100 text-amber-700"
-                  }`}
+                  className={`label px-2.5 py-1 rounded-lg ${risk.severity === "HIGH" ? "bg-red-100 text-red-700" : "bg-amber-100 text-amber-700"
+                    }`}
                 >
                   {risk.severity}
                 </span>
@@ -573,6 +675,7 @@ export default function OnboardingPage() {
   const [discoveryIndex, setDiscoveryIndex] = useState(0);
   const [profileConfirmed, setProfileConfirmed] = useState(false);
   const [selectedWorkflows, setSelectedWorkflows] = useState<string[]>([]);
+  const [customWorkflows, setCustomWorkflows] = useState<{ id: string; label: string; desc: string }[]>([]);
   const [analysisProgress, setAnalysisProgress] = useState(0);
   const [analysisStageIndex, setAnalysisStageIndex] = useState(0);
   const [risks, setRisks] = useState<Risk[]>([]);
@@ -596,7 +699,17 @@ export default function OnboardingPage() {
     setProfileConfirmed(true);
   }, [step, discoveryIndex, email]);
 
-  // ── Analysis progress bar (5 s total) ──
+  // ── Analysis stage ticker (advance one stage every 800ms) ──
+  useEffect(() => {
+    if (step !== "analyzing") return;
+    if (analysisStageIndex >= ANALYSIS_STAGES.length - 1) return;
+    const timer = setTimeout(() => {
+      setAnalysisStageIndex((i) => i + 1);
+    }, 800);
+    return () => clearTimeout(timer);
+  }, [step, analysisStageIndex]);
+
+  // Also advance progress for transition-to-results trigger
   useEffect(() => {
     if (step !== "analyzing") return;
     const interval = setInterval(() => {
@@ -605,15 +718,6 @@ export default function OnboardingPage() {
         return p + 2;
       });
     }, 100);
-    return () => clearInterval(interval);
-  }, [step]);
-
-  // Cycle analysis stage label
-  useEffect(() => {
-    if (step !== "analyzing") return;
-    const interval = setInterval(() => {
-      setAnalysisStageIndex((i) => Math.min(i + 1, ANALYSIS_STAGES.length - 1));
-    }, 900);
     return () => clearInterval(interval);
   }, [step]);
 
@@ -644,6 +748,13 @@ export default function OnboardingPage() {
     setSelectedWorkflows((prev) =>
       prev.includes(id) ? prev.filter((w) => w !== id) : [...prev, id]
     );
+  }
+
+  function handleAddCustomWorkflow(label: string) {
+    const id = `custom-${Date.now()}`;
+    const newW = { id, label, desc: "Custom workflow" };
+    setCustomWorkflows((prev) => [...prev, newW]);
+    setSelectedWorkflows((prev) => [...prev, id]);
   }
 
   function handleAnalyze() {
@@ -703,12 +814,14 @@ export default function OnboardingPage() {
         {step === "workflows" && (
           <WorkflowsStep
             selected={selectedWorkflows}
+            customWorkflows={customWorkflows}
             onToggle={toggleWorkflow}
+            onAddCustom={handleAddCustomWorkflow}
             onAnalyze={handleAnalyze}
           />
         )}
         {step === "analyzing" && (
-          <AnalyzingStep progress={analysisProgress} stage={ANALYSIS_STAGES[analysisStageIndex]} />
+          <AnalyzingStep stageIndex={analysisStageIndex} />
         )}
         {step === "results" && (
           <ResultsStep risks={risks} profile={profile} />
